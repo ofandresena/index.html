@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr Romina Planner</title> 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style pour une scrollbar plus discrète */
+        .event-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .event-list::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        /* Cacher le modal par défaut */
+        .modal {
+            display: none;
+        }
+        .modal.is-open {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-700">DrRomina-Planner 🩺</h1>
+                <div class="flex space-x-2">
+                    <button id="open-event-modal-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow transition duration-150">
+                        + Événement
+                    </button>
+                    <button id="open-task-modal-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg shadow transition duration-150">
+                        + Tâche
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:px-6 lg:px-8 mt-6">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-800">Emploi du Temps (Semaine)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-7 gap-2">
+                    <div class="day-col" data-day="Lundi">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Lundi</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                    <div class="day-col" data-day="Mardi">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Mardi</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                    <div class="day-col" data-day="Mercredi">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Mercredi</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                    <div class="day-col" data-day="Jeudi">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Jeudi</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                    <div class="day-col" data-day="Vendredi">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Vendredi</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                    <div class="day-col" data-day="Samedi">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Samedi</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                    <div class="day-col" data-day="Dimanche">
+                        <h3 class="font-semibold text-center text-gray-600 border-b pb-2">Dimanche</h3>
+                        <div class="event-list min-h-[200px] max-h-[400px] overflow-y-auto pt-2 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-green-800">Tâches & Révisions</h2>
+                <ul id="task-list" class="space-y-3">
+                    <li class="text-gray-500 italic">Aucune tâche pour le moment.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <div id="event-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 transition-opacity">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
+            <h3 class="text-2xl font-semibold mb-6">Ajouter un Événement</h3>
+            <form id="event-form">
+                <div class="mb-4">
+                    <label for="event-title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                    <input type="text" id="event-title" placeholder="Ex: Cours d'Anatomie" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="event-day" class="block text-sm font-medium text-gray-700 mb-1">Jour</label>
+                        <select id="event-day" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="Lundi">Lundi</option>
+                            <option value="Mardi">Mardi</option>
+                            <option value="Mercredi">Mercredi</option>
+                            <option value="Jeudi">Jeudi</option>
+                            <option value="Vendredi">Vendredi</option>
+                            <option value="Samedi">Samedi</option>
+                            <option value="Dimanche">Dimanche</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="event-time" class="block text-sm font-medium text-gray-700 mb-1">Heure</label>
+                        <input type="time" id="event-time" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="event-location" class="block text-sm font-medium text-gray-700 mb-1">Lieu / Salle</label>
+                    <input type="text" id="event-location" placeholder="Ex: Amphi B, Hôpital Nord" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="close-event-modal-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150">
+                        Annuler
+                    </button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow transition duration-150">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="task-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 transition-opacity">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
+            <h3 class="text-2xl font-semibold mb-6">Ajouter une Tâche</h3>
+            <form id="task-form">
+                <div class="mb-4">
+                    <label for="task-text" class="block text-sm font-medium text-gray-700 mb-1">Description de la tâche</label>
+                    <input type="text" id="task-text" placeholder="Ex: Relire le chapitre 5 de physio" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="task-category" class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                        <select id="task-category" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            <option value="Révision">Révision</option>
+                            <option value="Stage">Stage</option>
+                            <option value="Cours">Cours</option>
+                            <option value="Perso">Perso</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="task-due-date" class="block text-sm font-medium text-gray-700 mb-1">Échéance</Vlabel>
+                        <input type="date" id="task-due-date" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="close-task-modal-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150">
+                        Annuler
+                    </button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg shadow transition duration-150">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ----- SÉLECTEURS -----
+            const eventModal = document.getElementById('event-modal');
+            const taskModal = document.getElementById('task-modal');
+            const openEventModalBtn = document.getElementById('open-event-modal-btn');
+            const closeEventModalBtn = document.getElementById('close-event-modal-btn');
+            const openTaskModalBtn = document.getElementById('open-task-modal-btn');
+            const closeTaskModalBtn = document.getElementById('close-task-modal-btn');
+            const eventForm = document.getElementById('event-form');
+            const taskForm = document.getElementById('task-form');
+            const taskList = document.getElementById('task-list');
+
+            // ----- DONNÉES (Stockées dans localStorage) -----
+            let events = JSON.parse(localStorage.getItem('medEvents')) || [];
+            let tasks = JSON.parse(localStorage.getItem('medTasks')) || [];
+
+            // ----- COULEURS DES CATÉGORIES -----
+            const categoryColors = {
+                'Révision': 'bg-yellow-100 text-yellow-800',
+                'Stage': 'bg-purple-100 text-purple-800',
+                'Cours': 'bg-blue-100 text-blue-800',
+                'Perso': 'bg-pink-100 text-pink-800',
+                'Autre': 'bg-gray-200 text-gray-900',
+            };
+
+            // ----- FONCTIONS -----
+
+            // Sauvegarder les données dans localStorage
+            const saveEvents = () => {
+                localStorage.setItem('medEvents', JSON.stringify(events));
+            };
+            const saveTasks = () => {
+                localStorage.setItem('medTasks', JSON.stringify(tasks));
+            };
+
+            // Afficher les événements
+            const renderEvents = () => {
+                // Vider les listes d'événements
+                document.querySelectorAll('.event-list').forEach(list => list.innerHTML = '');
+
+                // Trier les événements par heure
+                events.sort((a, b) => a.time.localeCompare(b.time));
+
+                events.forEach(event => {
+                    const dayColumn = document.querySelector(`.day-col[data-day="${event.day}"] .event-list`);
+                    if (dayColumn) {
+                        const eventEl = document.createElement('div');
+                        eventEl.className = 'bg-blue-50 border border-blue-200 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer';
+                        eventEl.setAttribute('data-id', event.id);
+                        eventEl.innerHTML = `
+                            <p class="font-semibold text-blue-900">${event.title}</p>
+                            <p class="text-sm text-gray-600">${event.time}</p>
+                            ${event.location ? `<p class="text-sm text-gray-500 italic">${event.location}</p>` : ''}
+                            <button class="delete-event text-red-500 hover:text-red-700 text-xs float-right font-bold" data-id="${event.id}">✕</button>
+                        `;
+                        dayColumn.appendChild(eventEl);
+                    }
+                });
+            };
+
+            // Afficher les tâches
+            const renderTasks = () => {
+                taskList.innerHTML = ''; // Vider la liste
+                
+                if (tasks.length === 0) {
+                    taskList.innerHTML = '<li class="text-gray-500 italic">Aucune tâche pour le moment.</li>';
+                    return;
+                }
+
+                // Trier les tâches (non complétées d'abord, puis par date)
+                tasks.sort((a, b) => {
+                    if (a.completed !== b.completed) {
+                        return a.completed - b.completed; // Tâches non complétées en premier
+                    }
+                    // Si les deux sont incomplétées, trier par date
+                    if (!a.completed) {
+                        if (a.dueDate && b.dueDate) {
+                            return new Date(a.dueDate) - new Date(b.dueDate); // Date la plus proche en premier
+                        }
+                        if (a.dueDate) {
+                            return -1; // Tâches avec date avant celles sans date
+                        }
+                        if (b.dueDate) {
+                            return 1; // Tâches sans date après celles avec date
+                        }
+                    }
+                    return 0; // Garder l'ordre pour les tâches complétées ou sans date
+                });
+
+                tasks.forEach(task => {
+                    const taskEl = document.createElement('li');
+                    taskEl.className = `flex items-center justify-between p-3 bg-gray-50 rounded-md border ${task.completed ? 'opacity-60' : ''}`;
+                    taskEl.setAttribute('data-id', task.id);
+                    
+                    // Définir la couleur de la catégorie
+                    const categoryClass = categoryColors[task.category] || categoryColors['Autre'];
+
+                    // Gérer la date d'échéance
+                    let dueDateHtml = '';
+                    if (task.dueDate && !task.completed) {
+                        const dueDate = new Date(task.dueDate);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); // Normaliser "aujourd'hui"
+                        
+                        // Créer un objet date en UTC pour éviter les décalages de timezone
+                        const [year, month, day] = task.dueDate.split('-').map(Number);
+                        const dueDateUTC = new Date(Date.UTC(year, month - 1, day));
+
+                        // Mettre la date au format local (ex: 15/11)
+                        const formattedDate = dueDateUTC.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+
+                        let dateColor = 'text-gray-500';
+                        if (dueDateUTC < today) {
+                            dateColor = 'text-red-600 font-bold'; // En retard
+                        } else if (dueDateUTC.getTime() === today.getTime()) {
+                            dateColor = 'text-yellow-600 font-bold'; // Aujourd'hui
+                        }
+                        
+                        dueDateHtml = `<span class="text-xs ${dateColor} ml-2">(échéance: ${formattedDate})</span>`;
+                    }
+
+                    taskEl.innerHTML = `
+                        <div class="flex items-center space-x-3 flex-grow">
+                            <input type="checkbox" class="task-checkbox h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded" ${task.completed ? 'checked' : ''}>
+                            <div>
+                                <p class="font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}">${task.text}</p>
+                                <div>
+                                    ${task.category ? `<span class="text-xs ${categoryClass} px-2 py-0.5 rounded-full font-medium">${task.category}</span>` : ''}
+                                    ${dueDateHtml}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="delete-task text-gray-400 hover:text-red-600 font-bold flex-shrink-0" data-id="${task.id}">✕</button>
+                    `;
+                    taskList.appendChild(taskEl);
+                });
+            };
+
+            // ----- GESTION DES MODALS -----
+            const openModal = (modal) => modal.classList.add('is-open');
+            const closeModal = (modal) => modal.classList.remove('is-open');
+
+            openEventModalBtn.addEventListener('click', () => openModal(eventModal));
+            closeEventModalBtn.addEventListener('click', () => closeModal(eventModal));
+            openTaskModalBtn.addEventListener('click', () => openModal(taskModal));
+            closeTaskModalBtn.addEventListener('click', () => closeModal(taskModal));
+
+            // Fermer les modals en cliquant sur l'arrière-plan
+            [eventModal, taskModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            // ----- GESTION DES FORMULAIRES -----
+
+            // Ajouter un événement
+            eventForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newEvent = {
+                    id: Date.now(), // ID unique simple
+                    title: document.getElementById('event-title').value,
+                    day: document.getElementById('event-day').value,
+                    time: document.getElementById('event-time').value,
+                    location: document.getElementById('event-location').value
+                };
+                events.push(newEvent);
+                saveEvents();
+                renderEvents();
+                closeModal(eventModal);
+                eventForm.reset();
+            });
+
+            // Ajouter une tâche
+            taskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newTask = {
+                    id: Date.now(),
+                    text: document.getElementById('task-text').value,
+                    category: document.getElementById('task-category').value, // Lit la valeur du <select>
+                    dueDate: document.getElementById('task-due-date').value, // AJOUTÉ
+                    completed: false
+                };
+                tasks.push(newTask);
+                saveTasks();
+                renderTasks();
+                closeModal(taskModal);
+                taskForm.reset();
+            });
+
+            // ----- GESTION DES INTERACTIONS (Compléter / Supprimer) -----
+
+            // Utilisation de la délégation d'événements pour les tâches
+            taskList.addEventListener('click', (e) => {
+                const target = e.target;
+                const taskId = target.closest('li')?.dataset.id;
+                if (!taskId) return;
+
+                const task = tasks.find(t => t.id == taskId);
+
+                if (target.classList.contains('task-checkbox')) {
+                    // Compléter/Décocher la tâche
+                    task.completed = target.checked;
+                    saveTasks();
+                    renderTasks(); // Re-render pour appliquer les styles
+                }
+
+                if (target.classList.contains('delete-task')) {
+                    // Supprimer la tâche
+                    tasks = tasks.filter(t => t.id != taskId);
+                    saveTasks();
+                    renderTasks();
+                }
+            });
+
+            // Délégation d'événements pour supprimer des événements
+            document.querySelector('.lg\\:col-span-2').addEventListener('click', (e) => {
+                    const target = e.target;
+                if (target.classList.contains('delete-event')) {
+                    const eventId = target.dataset.id;
+                    events = events.filter(ev => ev.id != eventId);
+                    saveEvents();
+                    renderEvents();
+                }
+            });
+
+            // ----- INITIALISATION AU CHARGEMENT -----
+            renderEvents();
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
